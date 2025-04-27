@@ -605,7 +605,6 @@ dependencies = [
  "aws-sdk-ssm",
  "aws-sdk-sts",
  "aws-types",
- "serde",
 ]
 
 [[package]]

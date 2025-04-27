@@ -18,7 +18,4 @@ mod code_pipeline;
 #[cfg(feature = "code-pipeline")]
 pub use code_pipeline::CodePipeline;
 
-#[cfg(feature = "types")]
-pub mod types;
-
 mod helper;
