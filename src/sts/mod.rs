@@ -1,2 +1,2 @@
 mod sts;
-pub use sts::StsClient;
+pub use sts::Sts;

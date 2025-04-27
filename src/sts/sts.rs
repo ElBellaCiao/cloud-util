@@ -3,11 +3,11 @@ use aws_sdk_sts::types::Credentials;
 use anyhow::{anyhow, Result};
 use crate::helper::aws_client_or_default;
 
-pub struct StsClient {
+pub struct Sts {
     client: Client,
 }
 
-impl StsClient {
+impl Sts {
     pub async fn new(client: Option<Client>) -> Self {
         let client = aws_client_or_default(client, Client::new).await;
         Self { client }
