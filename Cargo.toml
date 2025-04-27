@@ -1,0 +1,17 @@
+[package]
+name = "cloud-util"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+ec2 = []
+ssm = []
+
+[dependencies]
+# Core runtime
+anyhow = "1"
+
+# AWS SDK
+aws-config = { version = "1", optional = true }
+aws-sdk-ec2 = { version = "1", optional = true }
+aws-sdk-ssm = { version = "1", optional = true }
