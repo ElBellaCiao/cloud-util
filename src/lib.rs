@@ -1,14 +1,22 @@
 #[cfg(feature = "ec2")]
-pub mod ec2;
+mod ec2;
+#[cfg(feature = "ec2")]
+pub use ec2::Ec2;
 
 #[cfg(feature = "ssm")]
-pub mod ssm;
+mod ssm;
+#[cfg(feature = "ssm")]
+pub use ssm::Ssm;
 
 #[cfg(feature = "sts")]
-pub mod sts;
+mod sts;
+#[cfg(feature = "sts")]
+pub use sts::StsClient;
 
 #[cfg(feature = "code-pipeline")]
-pub mod code_pipeline;
+mod code_pipeline;
+#[cfg(feature = "code-pipeline")]
+pub use code_pipeline::CodePipeline;
 
 #[cfg(feature = "types")]
 pub mod types;
