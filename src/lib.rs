@@ -7,3 +7,15 @@ pub use ec2::Ec2;
 mod ssm;
 #[cfg(feature = "ssm")]
 pub use ssm::Ssm;
+
+#[cfg(feature = "sts")]
+mod sts;
+#[cfg(feature = "sts")]
+pub use sts::StsClient;
+
+#[cfg(feature = "code-pipeline")]
+mod code_pipeline;
+mod helper;
+
+#[cfg(feature = "sts")]
+pub use code_pipeline::CodePipeline;

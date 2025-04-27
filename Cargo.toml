@@ -8,10 +8,17 @@ edition = "2024"
 anyhow = "1"
 
 # AWS SDK
-aws-config = { version = "1" }
+aws-config = "1"
+aws-types = "1"
+
 aws-sdk-ec2 = { version = "1", optional = true }
 aws-sdk-ssm = { version = "1", optional = true }
+aws-sdk-sts = { version = "1", optional = true }
+aws-sdk-codepipeline = { version = "1", optional = true }
 
 [features]
 ec2 = ["aws-sdk-ec2"]
 ssm = ["aws-sdk-ssm"]
+sts = ["aws-sdk-sts"]
+code-pipeline = ["aws-sdk-codepipeline"]
+all = ["ec2", "ssm", "sts", "code-pipeline"]

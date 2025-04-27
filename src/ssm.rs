@@ -1,26 +1,18 @@
 use std::time::Duration;
-use aws_config::BehaviorVersion;
 use aws_sdk_ssm::client::Waiters;
 use anyhow::{anyhow, Result};
+use aws_sdk_ssm::Client;
+use crate::helper::aws_client_or_default;
 
 pub struct Ssm {
-    client: aws_sdk_ssm::Client,
+    client: Client,
 }
 
 impl Ssm {
     const WORKING_DIR: &'static str = "/home/ec2-user";
 
-    pub async fn new(client: Option<aws_sdk_ssm::Client>) -> Self {
-        let client = match client {
-            Some(client) => client,
-            None => {
-                let config = aws_config::defaults(BehaviorVersion::latest())
-                    .load()
-                    .await;
-                aws_sdk_ssm::Client::new(&config)
-            }
-        };
-
+    pub async fn new(client: Option<Client>) -> Self {
+        let client = aws_client_or_default(client, Client::new).await;
         Self { client }
     }
 

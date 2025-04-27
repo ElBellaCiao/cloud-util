@@ -134,6 +134,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-sdk-codepipeline"
+version = "1.75.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25ee77e251903f40da5fac1d7db54b5ab8419bff72d1ed8511401d282599328c"
+dependencies = [
+ "aws-credential-types",
+ "aws-runtime",
+ "aws-smithy-async",
+ "aws-smithy-http",
+ "aws-smithy-json",
+ "aws-smithy-runtime",
+ "aws-smithy-runtime-api",
+ "aws-smithy-types",
+ "aws-types",
+ "bytes",
+ "fastrand",
+ "http 0.2.12",
+ "once_cell",
+ "regex-lite",
+ "tracing",
+]
+
+[[package]]
 name = "aws-sdk-ec2"
 version = "1.123.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -577,8 +600,11 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "aws-config",
+ "aws-sdk-codepipeline",
  "aws-sdk-ec2",
  "aws-sdk-ssm",
+ "aws-sdk-sts",
+ "aws-types",
 ]
 
 [[package]]

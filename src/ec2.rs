@@ -1,26 +1,18 @@
 use std::collections::HashMap;
 use std::time::Duration;
-use aws_config::BehaviorVersion;
 use aws_sdk_ec2::client::Waiters;
 use anyhow::Result;
 use aws_sdk_ec2::types::Filter;
+use aws_sdk_ec2::Client;
+use crate::helper::aws_client_or_default;
 
 pub struct Ec2 {
-    client: aws_sdk_ec2::Client,
+    client: Client,
 }
 
 impl Ec2 {
-    pub async fn new(client: Option<aws_sdk_ec2::Client>) -> Self {
-        let client = match client {
-            Some(client) => client,
-            None => {
-                let config = aws_config::defaults(BehaviorVersion::latest())
-                    .load()
-                    .await;
-                aws_sdk_ec2::Client::new(&config)
-            }
-        };
-
+    pub async fn new(client: Option<Client>) -> Self {
+        let client = aws_client_or_default(client, Client::new).await;
         Self { client }
     }
 
