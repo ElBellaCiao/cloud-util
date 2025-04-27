@@ -13,7 +13,7 @@ impl CodePipeline {
         Self { client }
     }
 
-    async fn post_success(&self, job_id: &str) -> Result<()> {
+    pub async fn post_success(&self, job_id: &str) -> Result<()> {
         println!("Job Succeeded");
 
         self.client.put_job_success_result()
@@ -23,7 +23,7 @@ impl CodePipeline {
         Ok(())
     }
 
-    async fn post_failure(&self, job_id: &str, msg: &str) -> Result<()> {
+    pub async fn post_failure(&self, job_id: &str, msg: &str) -> Result<()> {
         println!("Job Failed");
 
         let failure_details = FailureDetails::builder()
