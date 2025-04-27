@@ -10,4 +10,7 @@ pub mod sts;
 #[cfg(feature = "code-pipeline")]
 pub mod code_pipeline;
 
+#[cfg(feature = "types")]
+pub mod types;
+
 mod helper;

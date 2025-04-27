@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 # Core runtime
 anyhow = "1"
+serde = { version = "1", features = ["derive"] }
 
 # AWS SDK
 aws-config = "1"
@@ -21,4 +22,5 @@ ec2 = ["aws-sdk-ec2"]
 ssm = ["aws-sdk-ssm"]
 sts = ["aws-sdk-sts"]
 code-pipeline = ["aws-sdk-codepipeline"]
+types = []
 all = ["ec2", "ssm", "sts", "code-pipeline"]
