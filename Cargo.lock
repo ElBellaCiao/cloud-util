@@ -603,7 +603,6 @@ dependencies = [
  "aws-sdk-codepipeline",
  "aws-sdk-ec2",
  "aws-sdk-ssm",
- "aws-sdk-sts",
  "aws-types",
 ]
 

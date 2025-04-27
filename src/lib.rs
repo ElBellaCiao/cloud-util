@@ -8,11 +8,6 @@ mod ssm;
 #[cfg(feature = "ssm")]
 pub use ssm::Ssm;
 
-#[cfg(feature = "sts")]
-mod sts;
-#[cfg(feature = "sts")]
-pub use sts::Sts;
-
 #[cfg(feature = "code-pipeline")]
 mod code_pipeline;
 #[cfg(feature = "code-pipeline")]
