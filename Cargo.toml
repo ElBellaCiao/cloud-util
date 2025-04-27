@@ -8,10 +8,10 @@ edition = "2024"
 anyhow = "1"
 
 # AWS SDK
-aws-config = { version = "1", optional = true }
+aws-config = { version = "1" }
 aws-sdk-ec2 = { version = "1", optional = true }
 aws-sdk-ssm = { version = "1", optional = true }
 
 [features]
-ec2 = ["aws-sdk-ec2", "aws-config"]
-ssm = ["aws-sdk-ssm", "aws-config"]
+ec2 = ["aws-sdk-ec2"]
+ssm = ["aws-sdk-ssm"]
