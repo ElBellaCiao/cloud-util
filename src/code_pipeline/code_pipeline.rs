@@ -24,7 +24,7 @@ impl CodePipeline {
     }
 
     pub async fn post_failure(&self, job_id: &str, msg: &str) -> Result<()> {
-        println!("Job Failed");
+        println!("Job Failed: {msg}");
 
         let failure_details = FailureDetails::builder()
             .message(msg)
