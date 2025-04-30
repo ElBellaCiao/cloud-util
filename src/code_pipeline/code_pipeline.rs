@@ -20,6 +20,7 @@ impl CodePipeline {
             .job_id(job_id)
             .send().await?;
 
+        println!("Job Success Sent");
         Ok(())
     }
 
@@ -36,6 +37,7 @@ impl CodePipeline {
             .send()
             .await?;
 
+        println!("Job Failure Sent");
         Ok(())
     }
 }
