@@ -13,4 +13,9 @@ mod code_pipeline;
 #[cfg(feature = "code-pipeline")]
 pub use code_pipeline::CodePipeline;
 
+#[cfg(feature = "secretsmanager")]
+mod secretsmanager;
+#[cfg(feature = "secretsmanager")]
+pub use secretsmanager::SecretsManager;
+
 mod helper;
