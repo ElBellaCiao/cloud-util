@@ -12,13 +12,16 @@ impl SecretsManager {
     }
 
     pub async fn get_secret(&self, secret_name: &str) -> Result<String> {
-        println!("searching for secret {secret_name}");
+        println!("Searching for secret {secret_name}");
 
         let response = self.client.get_secret_value()
             .secret_id(secret_name)
             .send()
             .await?;
 
-        response.secret_string.ok_or_else(|| anyhow!("secret {} not found", secret_name))
+        let secret_value = response.secret_string.ok_or_else(|| anyhow!("secret {} not found", secret_name))?;
+
+        println!("Found secret {secret_name}");
+        Ok(secret_value)
     }
 }
