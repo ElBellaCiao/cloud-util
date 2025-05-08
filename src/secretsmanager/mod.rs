@@ -12,6 +12,8 @@ impl SecretsManager {
     }
 
     pub async fn get_secret(&self, secret_name: &str) -> Result<String> {
+        println!("searching for secret {secret_name}");
+
         let response = self.client.get_secret_value()
             .secret_id(secret_name)
             .send()
