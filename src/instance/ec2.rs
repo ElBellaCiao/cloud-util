@@ -4,6 +4,7 @@ use aws_sdk_ec2::client::Waiters;
 use aws_sdk_ec2::types::Filter;
 use aws_sdk_ec2::Client;
 use std::collections::HashMap;
+use std::net::IpAddr;
 use std::time::Duration;
 use crate::instance::InstanceMetadata;
 
@@ -113,7 +114,7 @@ impl crate::instance::Instance for Ec2 {
 
         let private_ip = instance.private_ip_address()
             .ok_or_else(|| anyhow::anyhow!("No private IP found for {}", instance_id))?
-            .to_string();
+            .parse::<IpAddr>()?;
 
         let metadata = InstanceMetadata {
             private_ip

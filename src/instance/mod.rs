@@ -1,11 +1,12 @@
 use std::collections::HashMap;
+use std::net::IpAddr;
 use anyhow::Result;
 
 pub mod ec2;
 pub use ec2::Ec2;
 
 pub struct InstanceMetadata {
-    pub private_ip: String,
+    pub private_ip: IpAddr,
 }
 
 #[async_trait::async_trait]
