@@ -5,8 +5,8 @@ use serde::{Serialize, de::DeserializeOwned};
 use anyhow::Result;
 
 pub trait Keyed {
-    fn pk(&self) -> &str;
-    fn sk(&self) -> &str;
+    fn pk(&self) -> String;
+    fn sk(&self) -> String;
 }
 #[async_trait::async_trait]
 pub trait Table<T>: Send + Sync
