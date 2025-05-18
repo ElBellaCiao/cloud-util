@@ -24,13 +24,13 @@ impl<T> Table<T> for DynamoDb
 where
     T: Serialize + DeserializeOwned + Keyed + Send + Sync + 'static,
 {
-    async fn get_entry(&self, pk: String, sk: String) -> Result<T> {
+    async fn get_entry(&self, pk: &str, sk: &str) -> Result<T> {
         let resp = self
             .client
             .get_item()
             .table_name(&self.table_name)
-            .key("PK", AttributeValue::S(pk))
-            .key("SK", AttributeValue::S(sk))
+            .key("PK", AttributeValue::S(pk.into()))
+            .key("SK", AttributeValue::S(sk.into()))
             .send()
             .await?;
 
@@ -41,8 +41,8 @@ where
 
     async fn put_entry(&self, item: T) -> Result<()> {
         let mut item_map: HashMap<String, AttributeValue> = serde_dynamo::to_item(&item)?;
-        item_map.insert("PK".to_string(), AttributeValue::S(item.pk()));
-        item_map.insert("SK".to_string(), AttributeValue::S(item.sk()));
+        item_map.insert("PK".to_string(), AttributeValue::S(item.pk().into()));
+        item_map.insert("SK".to_string(), AttributeValue::S(item.sk().into()));
 
         self.client
             .put_item()
