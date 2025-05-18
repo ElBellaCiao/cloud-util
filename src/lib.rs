@@ -1,7 +1,7 @@
-#[cfg(feature = "ec2")]
-mod ec2;
-#[cfg(feature = "ec2")]
-pub use ec2::Ec2;
+#[cfg(feature = "instance")]
+mod instance;
+#[cfg(feature = "instance")]
+pub use instance::{Ec2, Instance};
 
 #[cfg(feature = "ssm")]
 mod ssm;
@@ -17,5 +17,10 @@ pub use code_pipeline::CodePipeline;
 mod secretsmanager;
 #[cfg(feature = "secretsmanager")]
 pub use secretsmanager::SecretsManager;
+
+#[cfg(feature = "table")]
+mod table;
+#[cfg(feature = "table")]
+pub use table::{Table, Keyed, DynamoDb};
 
 mod helper;

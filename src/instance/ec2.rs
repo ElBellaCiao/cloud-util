@@ -1,10 +1,10 @@
-use std::collections::HashMap;
-use std::time::Duration;
-use aws_sdk_ec2::client::Waiters;
+use crate::helper::aws_client_or_default;
 use anyhow::Result;
+use aws_sdk_ec2::client::Waiters;
 use aws_sdk_ec2::types::Filter;
 use aws_sdk_ec2::Client;
-use crate::helper::aws_client_or_default;
+use std::collections::HashMap;
+use std::time::Duration;
 
 pub struct Ec2 {
     client: Client,
@@ -15,8 +15,11 @@ impl Ec2 {
         let client = aws_client_or_default(client, Client::new).await;
         Self { client }
     }
+}
 
-    pub async fn get_tags_by_instance(&self, instance_id: &String) -> Result<HashMap<String, String>> {
+#[async_trait::async_trait]
+impl crate::instance::Instance for Ec2 {
+    async fn get_tags_by_instance(&self, instance_id: &str) -> Result<HashMap<String, String>> {
         let filters = Filter::builder()
             .name("resource-id")
             .values(instance_id)
@@ -34,7 +37,7 @@ impl Ec2 {
         Ok(tag_map)
     }
 
-    pub async fn get_instances_by_tags(&self, tags: &HashMap<String, String>) -> Result<Vec<String>> {
+    async fn get_instances_by_tags(&self, tags: &HashMap<String, String>) -> Result<Vec<String>> {
         let filters = tags.iter().map(|(key, value)| {
             Filter::builder()
                 .name(format!("tag:{}", key))
@@ -59,7 +62,7 @@ impl Ec2 {
         Ok(instance_ids)
     }
 
-    pub async fn start_instances(&self, instance_ids: &[String]) -> Result<()> {
+    async fn start_instances(&self, instance_ids: &[String]) -> Result<()> {
         self.client
             .start_instances()
             .set_instance_ids(Some(instance_ids.to_vec()))
@@ -76,7 +79,7 @@ impl Ec2 {
         Ok(())
     }
 
-    pub async fn stop_instances(&self, instance_ids: &[String]) -> Result<()> {
+    async fn stop_instances(&self, instance_ids: &[String]) -> Result<()> {
         self.client
             .stop_instances()
             .set_instance_ids(Some(instance_ids.to_vec()))

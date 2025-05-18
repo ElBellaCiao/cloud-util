@@ -12,12 +12,21 @@ aws-config = "1"
 aws-types = "1"
 
 aws-sdk-ec2 = { version = "1", optional = true }
+
 aws-sdk-ssm = { version = "1", optional = true }
+
 aws-sdk-codepipeline = { version = "1", optional = true }
+
 aws-sdk-secretsmanager = { version = "1", optional = true }
 
+aws-sdk-dynamodb = { version = "1", optional = true }
+serde = { version = "1.0.219", features = ["derive"], optional = true }
+serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+1"], optional = true }
+async-trait = "0.1.88"
+
 [features]
-ec2 = ["aws-sdk-ec2"]
+instance = ["aws-sdk-ec2"]
 ssm = ["aws-sdk-ssm"]
 code-pipeline = ["aws-sdk-codepipeline"]
 secretsmanager = ["aws-sdk-secretsmanager"]
+table = ["aws-sdk-dynamodb", "serde", "serde_dynamo"]
