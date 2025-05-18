@@ -1,3 +1,4 @@
+use crate::helper::aws_client_or_default;
 use crate::table::Keyed;
 use crate::Table;
 use anyhow::{anyhow, Result};
@@ -10,6 +11,12 @@ use std::collections::HashMap;
 pub struct DynamoDb {
     client: Client,
     table_name: String,
+}
+impl DynamoDb {
+    pub async fn new(client: Option<Client>, table_name: String) -> Self {
+        let client = aws_client_or_default(client, Client::new).await;
+        Self { client, table_name }
+    }
 }
 
 #[async_trait::async_trait]
