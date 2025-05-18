@@ -29,8 +29,8 @@ where
             .client
             .get_item()
             .table_name(&self.table_name)
-            .key("PK", AttributeValue::S(pk.into()))
-            .key("SK", AttributeValue::S(sk.into()))
+            .key("PK", AttributeValue::S(pk.to_string()))
+            .key("SK", AttributeValue::S(sk.to_string()))
             .send()
             .await?;
 
@@ -41,8 +41,8 @@ where
 
     async fn put_entry(&self, item: T) -> Result<()> {
         let mut item_map: HashMap<String, AttributeValue> = serde_dynamo::to_item(&item)?;
-        item_map.insert("PK".to_string(), AttributeValue::S(item.pk().into()));
-        item_map.insert("SK".to_string(), AttributeValue::S(item.sk().into()));
+        item_map.insert("PK".to_string(), AttributeValue::S(item.pk().to_string()));
+        item_map.insert("SK".to_string(), AttributeValue::S(item.sk().to_string()));
 
         self.client
             .put_item()
