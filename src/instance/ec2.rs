@@ -1,10 +1,11 @@
 use crate::helper::aws_client_or_default;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use aws_sdk_ec2::client::Waiters;
 use aws_sdk_ec2::types::Filter;
 use aws_sdk_ec2::Client;
 use std::collections::HashMap;
 use std::time::Duration;
+use crate::instance::InstanceMetadata;
 
 pub struct Ec2 {
     client: Client,
@@ -94,5 +95,30 @@ impl crate::instance::Instance for Ec2 {
 
         println!("Started {} instance(s)", instance_ids.len());
         Ok(())
+    }
+
+    async fn get_instance_metadata(&self, instance_id: &str) -> Result<InstanceMetadata> {
+        let response = self.client
+            .describe_instances()
+            .instance_ids(instance_id)
+            .send()
+            .await?;
+
+        let instance = response
+            .reservations()
+            .iter()
+            .flat_map(|r| r.instances())
+            .find(|inst| inst.instance_id() == Some(instance_id))
+            .ok_or_else(|| anyhow!("Instance {} not found", instance_id))?;
+
+        let private_ip = instance.private_ip_address()
+            .ok_or_else(|| anyhow::anyhow!("No private IP found for {}", instance_id))?
+            .to_string();
+
+        let metadata = InstanceMetadata {
+            private_ip
+        };
+
+        Ok(metadata)
     }
 }
