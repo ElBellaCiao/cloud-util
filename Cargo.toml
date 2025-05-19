@@ -10,8 +10,11 @@ anyhow = "1"
 # AWS SDK
 aws-config = "1"
 aws-types = "1"
+thiserror = "2"
 
 aws-sdk-ec2 = { version = "1", optional = true }
+derive_more = { version = "2", optional = true, features = ["display"] }
+regex = { version = "1", optional = true }
 
 aws-sdk-ssm = { version = "1", optional = true }
 
@@ -25,7 +28,7 @@ serde_dynamo = { version = "4", features = ["aws-sdk-dynamodb+1"], optional = tr
 async-trait = "0.1.88"
 
 [features]
-instance = ["aws-sdk-ec2"]
+instance = ["aws-sdk-ec2", "derive_more", "regex"]
 ssm = ["aws-sdk-ssm"]
 code-pipeline = ["aws-sdk-codepipeline"]
 secretsmanager = ["aws-sdk-secretsmanager"]

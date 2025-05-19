@@ -1,12 +1,14 @@
+use crate::common::CloudError;
 use crate::helper::aws_client_or_default;
-use anyhow::{anyhow, Result};
+use crate::instance::InstanceMetadata;
+use crate::InstanceId;
+use anyhow::Result;
 use aws_sdk_ec2::client::Waiters;
 use aws_sdk_ec2::types::Filter;
 use aws_sdk_ec2::Client;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::time::Duration;
-use crate::instance::InstanceMetadata;
 
 pub struct Ec2 {
     client: Client,
@@ -21,16 +23,17 @@ impl Ec2 {
 
 #[async_trait::async_trait]
 impl crate::instance::Instance for Ec2 {
-    async fn get_tags_by_instance(&self, instance_id: &str) -> Result<HashMap<String, String>> {
+    async fn get_tags_by_instance(&self, instance_id: &InstanceId) -> Result<HashMap<String, String>, CloudError> {
         let filters = Filter::builder()
             .name("resource-id")
-            .values(instance_id)
+            .values(instance_id.as_ref())
             .build();
         let response = self.client
             .describe_tags()
             .filters(filters)
             .send()
-            .await?;
+            .await
+            .map_err(CloudError::server)?;
         let tag_map = response.tags().iter()
             .filter_map(|tag| Some((tag.key()?.to_string(), tag.value()?.to_string())))
             .collect();
@@ -98,23 +101,25 @@ impl crate::instance::Instance for Ec2 {
         Ok(())
     }
 
-    async fn get_instance_metadata(&self, instance_id: &str) -> Result<InstanceMetadata> {
+    async fn get_instance_metadata(&self, instance_id: &InstanceId) -> Result<InstanceMetadata, CloudError> {
         let response = self.client
             .describe_instances()
-            .instance_ids(instance_id)
+            .instance_ids(instance_id.to_string())
             .send()
-            .await?;
+            .await
+            .map_err(CloudError::server)?;
 
         let instance = response
             .reservations()
             .iter()
             .flat_map(|r| r.instances())
-            .find(|inst| inst.instance_id() == Some(instance_id))
-            .ok_or_else(|| anyhow!("Instance {} not found", instance_id))?;
+            .find(|inst| inst.instance_id() == Some(instance_id.as_ref()))
+            .ok_or_else(|| CloudError::Client(format!("Instance {} not found", instance_id)))?;
 
         let private_ip = instance.private_ip_address()
-            .ok_or_else(|| anyhow::anyhow!("No private IP found for {}", instance_id))?
-            .parse::<IpAddr>()?;
+            .ok_or_else(|| CloudError::Client(format!("No private IP found for {}", instance_id)))?
+            .parse::<IpAddr>()
+            .map_err(CloudError::server)?;
 
         let metadata = InstanceMetadata {
             private_ip

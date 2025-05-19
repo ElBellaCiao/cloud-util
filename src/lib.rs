@@ -1,7 +1,7 @@
 #[cfg(feature = "instance")]
 mod instance;
 #[cfg(feature = "instance")]
-pub use instance::{Ec2, Instance};
+pub use instance::{Ec2, Instance, InstanceId};
 
 #[cfg(feature = "ssm")]
 mod ssm;
@@ -24,3 +24,4 @@ mod table;
 pub use table::{Table, Keyed, DynamoDb};
 
 mod helper;
+mod common;
