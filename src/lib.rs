@@ -1,3 +1,6 @@
+mod common;
+pub use common::CloudError;
+
 #[cfg(feature = "instance")]
 mod instance;
 #[cfg(feature = "instance")]
@@ -24,4 +27,3 @@ mod table;
 pub use table::{Table, Keyed, DynamoDb};
 
 mod helper;
-mod common;
