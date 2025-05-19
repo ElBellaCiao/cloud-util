@@ -5,7 +5,6 @@ use anyhow::{anyhow, Result};
 use aws_sdk_dynamodb::types::AttributeValue;
 use aws_sdk_dynamodb::Client;
 use serde::{de::DeserializeOwned, Serialize};
-use serde_dynamo;
 use std::collections::HashMap;
 
 pub struct DynamoDb {
