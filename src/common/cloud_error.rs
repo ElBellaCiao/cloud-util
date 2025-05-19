@@ -16,4 +16,8 @@ impl CloudError {
     {
         CloudError::Server(Box::new(e))
     }
+
+    pub fn client<S: Into<String>>(msg: S) -> Self {
+        CloudError::Client(msg.into())
+    }
 }
