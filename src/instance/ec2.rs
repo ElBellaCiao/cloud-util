@@ -114,10 +114,10 @@ impl crate::instance::Instance for Ec2 {
             .iter()
             .flat_map(|r| r.instances())
             .find(|inst| inst.instance_id() == Some(instance_id.as_ref()))
-            .ok_or_else(|| CloudError::Client(format!("Instance {} not found", instance_id)))?;
+            .ok_or_else(|| CloudError::client(format!("Instance {} not found", instance_id)))?;
 
         let private_ip = instance.private_ip_address()
-            .ok_or_else(|| CloudError::Client(format!("No private IP found for {}", instance_id)))?
+            .ok_or_else(|| CloudError::client(format!("No private IP found for {}", instance_id)))?
             .parse::<IpAddr>()
             .map_err(CloudError::server)?;
 

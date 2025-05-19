@@ -21,3 +21,5 @@ impl CloudError {
         CloudError::Client(msg.into())
     }
 }
+
+// could add status_code, is_retryable
