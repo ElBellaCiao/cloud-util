@@ -46,6 +46,9 @@ where
             .map_err(CloudError::server)?;
         item_map.insert("PK".to_string(), AttributeValue::S(item.pk()));
         item_map.insert("SK".to_string(), AttributeValue::S(item.sk()));
+        
+        println!("putting into table: {}", self.table_name);
+        println!("item: {:?}", &item_map);
 
         self.client
             .put_item()
@@ -54,6 +57,8 @@ where
             .send()
             .await
             .map_err(CloudError::server)?;
+
+        println!("Successfully put item into table: {}", self.table_name);
 
         Ok(())
     }
