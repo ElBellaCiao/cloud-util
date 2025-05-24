@@ -3,7 +3,7 @@ use derive_more::Display;
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(Debug, Eq, PartialEq, Hash, Display)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Display)]
 pub struct InstanceId {
     #[display(fmt = "{}", id_str)]
     instance_id: String,
