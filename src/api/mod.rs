@@ -7,9 +7,13 @@ pub use rest_api::RestApi;
 
 #[async_trait::async_trait]
 pub trait Api: Send + Sync {
-    async fn send_request<T: DeserializeOwned>(
-        &self, method: reqwest::Method,
+    async fn send_request<T, B>(
+        &self, 
+        method: reqwest::Method,
         url_suffix: &str,
-        body: Option<impl Serialize + Send>
-    ) -> Result<T, CloudError>;
+        body: Option<B>
+    ) -> Result<T, CloudError>
+    where
+        T: DeserializeOwned + 'static,
+        B: Serialize + Send + 'static;
 }
