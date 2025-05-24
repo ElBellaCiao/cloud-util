@@ -17,7 +17,7 @@ pub struct InstanceMetadata {
 pub trait Instance: Send + Sync {
     async fn get_tags_by_instance(&self, instance_id: &InstanceId) -> Result<HashMap<String, String>, CloudError>;
     async fn get_instances_by_tags(&self, tags: &HashMap<String, String>) -> Result<Vec<InstanceId>>;
-    async fn start_instances(&self, instance_ids: &[String]) -> Result<()>;
-    async fn stop_instances(&self, instance_ids: &[String]) -> Result<()>;
+    async fn start_instances(&self, instance_ids: &[InstanceId]) -> Result<()>;
+    async fn stop_instances(&self, instance_ids: &[InstanceId]) -> Result<()>;
     async fn get_instance_metadata(&self, instance_id: &InstanceId) -> Result<InstanceMetadata, CloudError>;
 }

@@ -67,16 +67,22 @@ impl crate::instance::Instance for Ec2 {
         Ok(instance_ids)
     }
 
-    async fn start_instances(&self, instance_ids: &[String]) -> Result<()> {
+    async fn start_instances(&self, instance_ids: &[InstanceId]) -> Result<()> {
+        let instance_id_strings: Vec<String> = instance_ids
+            .iter()
+            .map(AsRef::as_ref)
+            .map(str::to_string)
+            .collect();
+        
         self.client
             .start_instances()
-            .set_instance_ids(Some(instance_ids.to_vec()))
+            .set_instance_ids(Some(instance_id_strings.clone()))
             .send()
             .await?;
 
         self.client
             .wait_until_instance_status_ok()
-            .set_instance_ids(Some(instance_ids.to_vec()))
+            .set_instance_ids(Some(instance_id_strings.clone()))
             .wait(Duration::from_secs(6000))
             .await?;
 
@@ -84,16 +90,22 @@ impl crate::instance::Instance for Ec2 {
         Ok(())
     }
 
-    async fn stop_instances(&self, instance_ids: &[String]) -> Result<()> {
+    async fn stop_instances(&self, instance_ids: &[InstanceId]) -> Result<()> {
+        let instance_id_strings: Vec<String> = instance_ids
+            .iter()
+            .map(AsRef::as_ref)
+            .map(str::to_string)
+            .collect();
+        
         self.client
             .stop_instances()
-            .set_instance_ids(Some(instance_ids.to_vec()))
+            .set_instance_ids(Some(instance_id_strings.clone()))
             .send()
             .await?;
 
         self.client
             .wait_until_instance_stopped()
-            .set_instance_ids(Some(instance_ids.to_vec()))
+            .set_instance_ids(Some(instance_id_strings.clone()))
             .wait(Duration::from_secs(6000))
             .await?;
 
