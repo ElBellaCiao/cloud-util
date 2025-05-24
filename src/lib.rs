@@ -31,3 +31,8 @@ pub use table::{Table, Keyed, DynamoDb};
 mod metadata;
 #[cfg(feature = "metadata")]
 pub use metadata::{Ec2Metadata, Metadata};
+
+#[cfg(feature = "api")]
+mod api;
+#[cfg(feature = "api")]
+pub use api::{Api, RestApi};
