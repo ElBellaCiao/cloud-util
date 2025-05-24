@@ -1,4 +1,5 @@
 mod common;
+mod helper;
 pub use common::CloudError;
 
 #[cfg(feature = "instance")]
@@ -26,4 +27,7 @@ mod table;
 #[cfg(feature = "table")]
 pub use table::{Table, Keyed, DynamoDb};
 
-mod helper;
+#[cfg(feature = "metadata")]
+mod metadata;
+#[cfg(feature = "metadata")]
+pub use metadata::{Ec2Metadata, Metadata};
