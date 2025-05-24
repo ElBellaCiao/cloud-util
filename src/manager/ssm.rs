@@ -3,6 +3,7 @@ use aws_sdk_ssm::client::Waiters;
 use anyhow::{anyhow, Result};
 use aws_sdk_ssm::Client;
 use crate::helper::aws_client_or_default;
+use crate::InstanceId;
 
 pub struct Ssm {
     client: Client,
@@ -19,9 +20,15 @@ impl Ssm {
 
 #[async_trait::async_trait]
 impl crate::manager::Manager for Ssm {
-    async fn send(&self, instance_ids: &[String], commands: Vec<String>) -> Result<()> {
+    async fn send(&self, instance_ids: &[InstanceId], commands: Vec<String>) -> Result<()> {
+        let instance_id_strings: Vec<String> = instance_ids
+            .iter()
+            .map(AsRef::as_ref)
+            .map(str::to_string)
+            .collect();
+
         let response = self.client.send_command()
-            .set_instance_ids(Some(instance_ids.to_vec()))
+            .set_instance_ids(Some(instance_id_strings.clone()))
             .document_name("AWS-RunShellScript")
             .parameters("commands", commands)
             .parameters("workingDirectory", vec![Self::WORKING_DIR.to_string()])
@@ -31,7 +38,7 @@ impl crate::manager::Manager for Ssm {
         let command = response.command().ok_or_else(|| anyhow!("missing command in response"))?;
         let command_id = command.command_id().ok_or_else(|| anyhow!("missing command id in response"))?;
 
-        for instance_id in instance_ids {
+        for instance_id in &instance_id_strings {
             println!("Sending command to: {instance_id}");
 
             let waiting_result = self.client.wait_until_command_executed()
