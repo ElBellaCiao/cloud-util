@@ -7,10 +7,10 @@ mod instance;
 #[cfg(feature = "instance")]
 pub use instance::{Ec2, Instance, InstanceId};
 
-#[cfg(feature = "ssm")]
-mod ssm;
-#[cfg(feature = "ssm")]
-pub use ssm::Ssm;
+#[cfg(feature = "manager")]
+mod manager;
+#[cfg(feature = "manager")]
+pub use manager::{Manager, Ssm};
 
 #[cfg(feature = "code-pipeline")]
 mod code_pipeline;

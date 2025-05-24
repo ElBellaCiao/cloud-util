@@ -31,7 +31,7 @@ reqwest = { version = "0", optional = true }
 
 [features]
 instance = ["aws-sdk-ec2", "derive_more", "regex"]
-ssm = ["aws-sdk-ssm"]
+manager = ["aws-sdk-ssm"]
 code-pipeline = ["aws-sdk-codepipeline"]
 secretsmanager = ["aws-sdk-secretsmanager"]
 table = ["aws-sdk-dynamodb", "serde", "serde_dynamo"]

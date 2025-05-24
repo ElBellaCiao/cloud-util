@@ -15,8 +15,11 @@ impl Ssm {
         let client = aws_client_or_default(client, Client::new).await;
         Self { client }
     }
+}
 
-    pub async fn send(&self, instance_ids: &[String], commands: Vec<String>) -> Result<()> {
+#[async_trait::async_trait]
+impl crate::manager::Manager for Ssm {
+    async fn send(&self, instance_ids: &[String], commands: Vec<String>) -> Result<()> {
         let response = self.client.send_command()
             .set_instance_ids(Some(instance_ids.to_vec()))
             .document_name("AWS-RunShellScript")
