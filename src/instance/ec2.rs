@@ -42,7 +42,7 @@ impl crate::instance::Instance for Ec2 {
         Ok(tag_map)
     }
 
-    async fn get_instances_by_tags(&self, tags: &HashMap<String, String>) -> Result<Vec<String>> {
+    async fn get_instances_by_tags(&self, tags: &HashMap<String, String>) -> Result<Vec<InstanceId>> {
         let filters = tags.iter().map(|(key, value)| {
             Filter::builder()
                 .name(format!("tag:{}", key))
@@ -56,12 +56,12 @@ impl crate::instance::Instance for Ec2 {
             .send()
             .await?;
 
-        let instance_ids: Vec<String> = response.reservations()
+        let instance_ids: Vec<InstanceId> = response.reservations()
             .iter()
-            .flat_map(|reservation| { reservation.instances() })
-            .filter_map(|instance| { instance.instance_id() })
-            .map(|instance_id| instance_id.to_string())
-            .collect();
+            .flat_map(|reservation| reservation.instances())
+            .filter_map(|instance| instance.instance_id())
+            .map(InstanceId::new)
+            .collect::<Result<Vec<InstanceId>>>()?;
 
         println!("Found {} instance(s) with tags \"{:?}\"", instance_ids.len(), tags);
         Ok(instance_ids)
