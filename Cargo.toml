@@ -30,7 +30,7 @@ async-trait = "0.1.88"
 reqwest = { version = "0", optional = true }
 
 [features]
-instance = ["aws-sdk-ec2", "derive_more", "regex"]
+instance = ["aws-sdk-ec2", "derive_more", "regex", "serde"]
 manager = ["aws-sdk-ssm"]
 code-pipeline = ["aws-sdk-codepipeline"]
 secretsmanager = ["aws-sdk-secretsmanager"]
