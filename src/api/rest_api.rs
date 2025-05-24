@@ -3,6 +3,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use crate::CloudError;
 
+#[derive(Debug, Clone)]
 pub struct RestApi {
     client: Client,
     base_url: String,
