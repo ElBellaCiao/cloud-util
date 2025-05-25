@@ -43,7 +43,7 @@ impl crate::api::Api for RestApi {
         let response = request_builder
             .send()
             .await
-            .map_err(|e| CloudError::client(format!("Failed to send request: {}", e)))?;
+            .map_err(|e| CloudError::client(format!("Failed to send request: {:?}", e)))?;
 
         if !response.status().is_success() {
             let status = response.status();
@@ -52,7 +52,7 @@ impl crate::api::Api for RestApi {
         }
 
         let data = response.json::<T>().await
-            .map_err(|e| CloudError::client(format!("Failed to parse response: {}", e)))?;
+            .map_err(|e| CloudError::client(format!("Failed to parse response: {:?}", e)))?;
 
         Ok(data)
     }
