@@ -1,7 +1,8 @@
 use std::time::Duration;
 use aws_sdk_ssm::client::Waiters;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use aws_sdk_ssm::Client;
+use tracing::{info, warn};
 use crate::helper::aws_client_or_default;
 use crate::InstanceId;
 
@@ -21,6 +22,8 @@ impl Ssm {
 #[async_trait::async_trait]
 impl crate::manager::Manager for Ssm {
     async fn send(&self, instance_ids: &[InstanceId], commands: Vec<String>) -> Result<()> {
+        info!("Preparing commands: {commands:?}");
+
         let instance_id_strings: Vec<String> = instance_ids
             .iter()
             .map(AsRef::as_ref)
@@ -39,7 +42,7 @@ impl crate::manager::Manager for Ssm {
         let command_id = command.command_id().ok_or_else(|| anyhow!("missing command id in response"))?;
 
         for instance_id in &instance_id_strings {
-            println!("Sending command to: {instance_id}");
+            info!("Sending commands to: {instance_id}");
 
             let waiting_result = self.client.wait_until_command_executed()
                 .instance_id(instance_id)
@@ -54,16 +57,16 @@ impl crate::manager::Manager for Ssm {
                 .await?;
 
             let stdout = output.standard_output_content().unwrap_or_default();
-            println!("STDOUT:\n{stdout}");
+            info!("STDOUT:\n{stdout}");
 
             let stderr = output.standard_error_content().unwrap_or_default();
-            println!("STDERR:\n{stderr}");
+            warn!("STDERR:\n{stderr}");
 
             let status = output.status().ok_or_else(|| anyhow!("missing status in response"))?;
-            println!("command status: {status}");
+            info!("command status: {status}");
 
             if let Err(e) = waiting_result {
-                return Err(anyhow!("error waiting: {e}"));
+                bail!("error waiting: {e:?}");
             }
         }
 

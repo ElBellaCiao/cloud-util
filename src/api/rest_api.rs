@@ -1,4 +1,4 @@
-use anyhow::{anyhow, bail, Result};
+use anyhow::{bail, Result};
 use reqwest::Client;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -39,11 +39,10 @@ impl crate::api::Api for RestApi {
         if let Some(body_data) = body {
             request_builder = request_builder.json(&body_data);
         }
-        
+
         let response = request_builder
             .send()
-            .await
-            .map_err(|e| anyhow!("Failed to send request: {:?}", e))?;
+            .await?;
 
         if !response.status().is_success() {
             let status = response.status();
@@ -51,8 +50,7 @@ impl crate::api::Api for RestApi {
             bail!("API returned error status {}: {}", status, error_text);
         }
 
-        let data = response.json::<T>().await
-            .map_err(|e| anyhow!("Failed to parse response: {:?}", e))?;
+        let data = response.json::<T>().await?;
 
         Ok(data)
     }

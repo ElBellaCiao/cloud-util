@@ -8,6 +8,7 @@ use aws_sdk_ec2::Client;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::time::Duration;
+use tracing::info;
 
 pub struct Ec2 {
     client: Client,
@@ -36,7 +37,7 @@ impl crate::instance::Instance for Ec2 {
             .filter_map(|tag| Some((tag.key()?.to_string(), tag.value()?.to_string())))
             .collect();
 
-        println!("Found \"{:?}\" tag(s) from {}", tag_map, instance_id);
+        info!("Found \"{tag_map:?}\" tag(s) from {instance_id}");
         Ok(tag_map)
     }
 
@@ -61,7 +62,7 @@ impl crate::instance::Instance for Ec2 {
             .map(InstanceId::new)
             .collect::<Result<Vec<InstanceId>>>()?;
 
-        println!("Found {} instance(s) with tags \"{:?}\"", instance_ids.len(), tags);
+        info!("Found {} instance(s) with tags \"{:?}\"", instance_ids.len(), tags);
         Ok(instance_ids)
     }
 
@@ -84,7 +85,7 @@ impl crate::instance::Instance for Ec2 {
             .wait(Duration::from_secs(6000))
             .await?;
 
-        println!("Started {} instance(s)", instance_ids.len());
+        info!("Started {} instance(s)", instance_ids.len());
         Ok(())
     }
 
@@ -107,7 +108,7 @@ impl crate::instance::Instance for Ec2 {
             .wait(Duration::from_secs(6000))
             .await?;
 
-        println!("Started {} instance(s)", instance_ids.len());
+        info!("Stopped {} instance(s)", instance_ids.len());
         Ok(())
     }
 
