@@ -1,7 +1,7 @@
+use anyhow::{anyhow, bail, Result};
 use reqwest::Client;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use crate::CloudError;
 
 #[derive(Debug, Clone)]
 pub struct RestApi {
@@ -27,7 +27,7 @@ impl crate::api::Api for RestApi {
         method: reqwest::Method,
         url_suffix: &str,
         body: Option<B>
-    ) -> Result<T, CloudError>
+    ) -> Result<T>
     where
         T: DeserializeOwned + 'static,
         B: Serialize + Send + 'static {
@@ -43,16 +43,16 @@ impl crate::api::Api for RestApi {
         let response = request_builder
             .send()
             .await
-            .map_err(|e| CloudError::client(format!("Failed to send request: {:?}", e)))?;
+            .map_err(|e| anyhow!("Failed to send request: {:?}", e))?;
 
         if !response.status().is_success() {
             let status = response.status();
             let error_text = response.text().await.unwrap_or_else(|_| "Unable to get error details".to_string());
-            return Err(CloudError::client(format!("API returned error status {}: {}", status, error_text)));
+            bail!("API returned error status {}: {}", status, error_text);
         }
 
         let data = response.json::<T>().await
-            .map_err(|e| CloudError::client(format!("Failed to parse response: {:?}", e)))?;
+            .map_err(|e| anyhow!("Failed to parse response: {:?}", e))?;
 
         Ok(data)
     }

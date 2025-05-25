@@ -1,6 +1,4 @@
-mod common;
 mod helper;
-pub use common::CloudError;
 
 #[cfg(feature = "instance")]
 mod instance;

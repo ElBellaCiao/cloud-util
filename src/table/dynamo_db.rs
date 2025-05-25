@@ -1,7 +1,7 @@
 use crate::helper::aws_client_or_default;
 use crate::table::Keyed;
-use crate::{CloudError, Table};
-use anyhow::Result;
+use crate::Table;
+use anyhow::{anyhow, Result};
 use aws_sdk_dynamodb::types::AttributeValue;
 use aws_sdk_dynamodb::Client;
 use serde::{de::DeserializeOwned, Serialize};
@@ -23,7 +23,7 @@ impl<T> Table<T> for DynamoDb
 where
     T: Serialize + DeserializeOwned + Keyed + Send + Sync + 'static,
 {
-    async fn get_entry(&self, pk: &str, sk: &str) -> Result<T, CloudError> {
+    async fn get_entry(&self, pk: &str, sk: &str) -> Result<T> {
         let resp = self
             .client
             .get_item()
@@ -31,19 +31,16 @@ where
             .key("PK", AttributeValue::S(pk.to_string()))
             .key("SK", AttributeValue::S(sk.to_string()))
             .send()
-            .await
-            .map_err(CloudError::server)?;
+            .await?;
 
         let item = resp.item
-            .ok_or_else(|| CloudError::client(format!("Item not found for {}:{}", pk, sk)))?;
-        let result = serde_dynamo::from_item(item)
-            .map_err(CloudError::server)?;
+            .ok_or_else(|| anyhow!("Item not found for {}:{}", pk, sk))?;
+        let result = serde_dynamo::from_item(item)?;
         Ok(result)
     }
 
-    async fn put_entry(&self, item: T) -> Result<(), CloudError> {
-        let mut item_map: HashMap<String, AttributeValue> = serde_dynamo::to_item(&item)
-            .map_err(CloudError::server)?;
+    async fn put_entry(&self, item: T) -> Result<()> {
+        let mut item_map: HashMap<String, AttributeValue> = serde_dynamo::to_item(&item)?;
         item_map.insert("PK".to_string(), AttributeValue::S(item.pk()));
         item_map.insert("SK".to_string(), AttributeValue::S(item.sk()));
 
@@ -52,8 +49,7 @@ where
             .table_name(&self.table_name)
             .set_item(Some(item_map))
             .send()
-            .await
-            .map_err(CloudError::server)?;
+            .await?;
 
         Ok(())
     }

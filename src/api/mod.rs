@@ -1,6 +1,6 @@
+use anyhow::Result;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use crate::CloudError;
 
 mod rest_api;
 pub use rest_api::RestApi;
@@ -12,7 +12,7 @@ pub trait Api: Send + Sync {
         method: reqwest::Method,
         url_suffix: &str,
         body: Option<B>
-    ) -> Result<T, CloudError>
+    ) -> Result<T>
     where
         T: DeserializeOwned + 'static,
         B: Serialize + Send + 'static;
