@@ -11,7 +11,7 @@ pub struct Ssm {
 }
 
 impl Ssm {
-    const WORKING_DIR: &'static str = "/home/instance-user";
+    const WORKING_DIR: &'static str = "/home/ec2-user";
 
     pub async fn new(client: Option<Client>) -> Self {
         let client = aws_client_or_default(client, Client::new).await;
