@@ -9,6 +9,7 @@ pub use ec2::Ec2;
 pub use instance_id::InstanceId;
 
 pub struct InstanceMetadata {
+    pub instance_id: InstanceId,
     pub private_ip: IpAddr,
 }
 

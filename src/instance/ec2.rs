@@ -131,7 +131,8 @@ impl crate::instance::Instance for Ec2 {
             .parse::<IpAddr>()?;
 
         let metadata = InstanceMetadata {
-            private_ip
+            private_ip,
+            instance_id: instance_id.clone(),
         };
 
         Ok(metadata)
