@@ -1,6 +1,6 @@
 use anyhow::Result;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 
 mod rest_api;
 pub use rest_api::RestApi;
@@ -8,10 +8,10 @@ pub use rest_api::RestApi;
 #[async_trait::async_trait]
 pub trait Api: Send + Sync {
     async fn send_request<T, B>(
-        &self, 
+        &self,
         method: reqwest::Method,
         url_suffix: &str,
-        body: Option<B>
+        body: Option<B>,
     ) -> Result<T>
     where
         T: DeserializeOwned + 'static,

@@ -1,10 +1,10 @@
-use std::time::Duration;
-use aws_sdk_ssm::client::Waiters;
-use anyhow::{anyhow, bail, Result};
-use aws_sdk_ssm::Client;
-use tracing::{info, warn};
-use crate::helper::aws_client_or_default;
 use crate::InstanceId;
+use crate::helper::aws_client_or_default;
+use anyhow::{Result, anyhow, bail};
+use aws_sdk_ssm::Client;
+use aws_sdk_ssm::client::Waiters;
+use std::time::Duration;
+use tracing::{info, warn};
 
 pub struct Ssm {
     client: Client,
@@ -30,7 +30,9 @@ impl crate::manager::Manager for Ssm {
             .map(str::to_string)
             .collect();
 
-        let response = self.client.send_command()
+        let response = self
+            .client
+            .send_command()
             .set_instance_ids(Some(instance_id_strings.clone()))
             .document_name("AWS-RunShellScript")
             .parameters("commands", commands)
@@ -38,19 +40,27 @@ impl crate::manager::Manager for Ssm {
             .send()
             .await?;
 
-        let command = response.command().ok_or_else(|| anyhow!("missing command in response"))?;
-        let command_id = command.command_id().ok_or_else(|| anyhow!("missing command id in response"))?;
+        let command = response
+            .command()
+            .ok_or_else(|| anyhow!("missing command in response"))?;
+        let command_id = command
+            .command_id()
+            .ok_or_else(|| anyhow!("missing command id in response"))?;
 
         for instance_id in &instance_id_strings {
             info!("Sending commands to: {instance_id}");
 
-            let waiting_result = self.client.wait_until_command_executed()
+            let waiting_result = self
+                .client
+                .wait_until_command_executed()
                 .instance_id(instance_id)
                 .command_id(command_id)
                 .wait(Duration::from_secs(60))
                 .await;
 
-            let output = self.client.get_command_invocation()
+            let output = self
+                .client
+                .get_command_invocation()
                 .instance_id(instance_id)
                 .command_id(command_id)
                 .send()
@@ -62,7 +72,9 @@ impl crate::manager::Manager for Ssm {
             let stderr = output.standard_error_content().unwrap_or_default();
             warn!("STDERR:\n{stderr}");
 
-            let status = output.status().ok_or_else(|| anyhow!("missing status in response"))?;
+            let status = output
+                .status()
+                .ok_or_else(|| anyhow!("missing status in response"))?;
             info!("command status: {status}");
 
             if let Err(e) = waiting_result {

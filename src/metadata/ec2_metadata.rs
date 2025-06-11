@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use anyhow::Result;
+use std::fmt::Display;
 
 pub struct Ec2Metadata {
     client: reqwest::Client,
@@ -27,8 +27,12 @@ impl Ec2Metadata {
     }
 
     pub async fn request(&self, request: impl Display) -> Result<String> {
-        let response = self.client
-            .get(format!("http://169.254.169.254/latest/meta-data/{}", &request))
+        let response = self
+            .client
+            .get(format!(
+                "http://169.254.169.254/latest/meta-data/{}",
+                &request
+            ))
             .header("X-aws-ec2-metadata-token", &self.token)
             .send()
             .await?

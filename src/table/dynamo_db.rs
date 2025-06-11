@@ -1,10 +1,10 @@
+use crate::Table;
 use crate::helper::aws_client_or_default;
 use crate::table::Keyed;
-use crate::Table;
-use anyhow::{anyhow, Result};
-use aws_sdk_dynamodb::types::AttributeValue;
+use anyhow::{Result, anyhow};
 use aws_sdk_dynamodb::Client;
-use serde::{de::DeserializeOwned, Serialize};
+use aws_sdk_dynamodb::types::AttributeValue;
+use serde::{Serialize, de::DeserializeOwned};
 use std::collections::HashMap;
 
 pub struct DynamoDb {
@@ -33,7 +33,8 @@ where
             .send()
             .await?;
 
-        let item = resp.item
+        let item = resp
+            .item
             .ok_or_else(|| anyhow!("Item not found for {}:{}", pk, sk))?;
         let result = serde_dynamo::from_item(item)?;
         Ok(result)

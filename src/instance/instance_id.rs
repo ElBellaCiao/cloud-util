@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use derive_more::Display;
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};

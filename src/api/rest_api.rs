@@ -1,7 +1,7 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use reqwest::Client;
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 
 #[derive(Debug, Clone)]
 pub struct RestApi {
@@ -26,12 +26,12 @@ impl crate::api::Api for RestApi {
         &self,
         method: reqwest::Method,
         url_suffix: &str,
-        body: Option<B>
+        body: Option<B>,
     ) -> Result<T>
     where
         T: DeserializeOwned + 'static,
-        B: Serialize + Send + 'static {
-
+        B: Serialize + Send + 'static,
+    {
         let url = format!("{}/{}", self.base_url, url_suffix);
 
         let mut request_builder = self.client.request(method, &url);
@@ -40,13 +40,14 @@ impl crate::api::Api for RestApi {
             request_builder = request_builder.json(&body_data);
         }
 
-        let response = request_builder
-            .send()
-            .await?;
+        let response = request_builder.send().await?;
 
         if !response.status().is_success() {
             let status = response.status();
-            let error_text = response.text().await.unwrap_or_else(|_| "Unable to get error details".to_string());
+            let error_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unable to get error details".to_string());
             bail!("API returned error status {}: {}", status, error_text);
         }
 
