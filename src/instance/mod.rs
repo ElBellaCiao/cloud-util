@@ -2,12 +2,12 @@ use anyhow::Result;
 use std::collections::HashMap;
 
 mod ec2;
-mod instance;
 mod instance_id;
+mod instance_model;
 
 pub use ec2::Ec2;
-pub use instance::{InstanceMetadata, InstanceState};
 pub use instance_id::InstanceId;
+pub use instance_model::{InstanceMetadata, InstanceState};
 
 #[async_trait::async_trait]
 pub trait Instance: Send + Sync {
