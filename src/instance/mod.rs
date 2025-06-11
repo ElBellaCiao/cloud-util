@@ -1,17 +1,16 @@
 use anyhow::Result;
 use std::collections::HashMap;
-use std::net::IpAddr;
 
-pub mod ec2;
-pub mod instance_id;
+mod ec2;
+mod instance_id;
+mod instance;
 
 pub use ec2::Ec2;
+pub use instance::{
+    InstanceMetadata,
+    InstanceState
+};
 pub use instance_id::InstanceId;
-
-pub struct InstanceMetadata {
-    pub instance_id: InstanceId,
-    pub private_ip: IpAddr,
-}
 
 #[async_trait::async_trait]
 pub trait Instance: Send + Sync {

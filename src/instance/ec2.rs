@@ -130,9 +130,14 @@ impl crate::instance::Instance for Ec2 {
             .ok_or_else(|| anyhow!("No private IP found for {}", instance_id))?
             .parse::<IpAddr>()?;
 
+        let status = instance.state()
+            .and_then(|state| state.name())
+            .ok_or_else(|| anyhow!("No status found for {}", instance_id))?;
+
         let metadata = InstanceMetadata {
             private_ip,
             instance_id: instance_id.clone(),
+            status: status.into()
         };
 
         Ok(metadata)
