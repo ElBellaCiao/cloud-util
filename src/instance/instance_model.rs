@@ -2,7 +2,7 @@ use crate::InstanceId;
 use aws_sdk_ec2::types::InstanceStateName;
 use std::net::IpAddr;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InstanceState {
     Starting,
     Running,
