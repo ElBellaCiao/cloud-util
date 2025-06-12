@@ -10,12 +10,7 @@ pub struct RestApi {
 }
 
 impl RestApi {
-    pub fn new(base_url: String) -> Self {
-        let client = Client::builder()
-            .timeout(std::time::Duration::from_secs(30))
-            .build()
-            .expect("Failed to create HTTP client");
-
+    pub fn new(client: Client, base_url: String) -> Self {
         Self { client, base_url }
     }
 }
