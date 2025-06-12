@@ -1,11 +1,11 @@
 use anyhow::Result;
 use std::collections::HashMap;
 
-mod ec2;
+mod ec2_client;
 mod instance_id;
 mod instance_model;
 
-pub use ec2::Ec2;
+pub use ec2_client::Ec2Client;
 pub use instance_id::InstanceId;
 pub use instance_model::{InstanceMetadata, InstanceState};
 

@@ -10,11 +10,11 @@ use std::net::IpAddr;
 use std::time::Duration;
 use tracing::info;
 
-pub struct Ec2 {
+pub struct Ec2Client {
     client: Client,
 }
 
-impl Ec2 {
+impl Ec2Client {
     pub async fn new(client: Option<Client>) -> Self {
         let client = aws_client_or_default(client, Client::new).await;
         Self { client }
@@ -22,7 +22,7 @@ impl Ec2 {
 }
 
 #[async_trait::async_trait]
-impl crate::instance::Instance for Ec2 {
+impl crate::instance::Instance for Ec2Client {
     async fn get_tags_by_instance(
         &self,
         instance_id: &InstanceId,

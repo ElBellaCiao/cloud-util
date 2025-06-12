@@ -3,7 +3,7 @@ mod helper;
 #[cfg(feature = "instance")]
 mod instance;
 #[cfg(feature = "instance")]
-pub use instance::{Ec2, Instance, InstanceId, InstanceMetadata, InstanceState};
+pub use instance::{Ec2Client, Instance, InstanceId, InstanceMetadata, InstanceState};
 
 #[cfg(feature = "manager")]
 mod manager;
