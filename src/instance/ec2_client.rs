@@ -1,10 +1,9 @@
-use crate::InstanceId;
-use crate::helper::aws_client_or_default;
 use crate::instance::InstanceMetadata;
-use anyhow::{Result, anyhow};
-use aws_sdk_ec2::Client;
+use crate::InstanceId;
+use anyhow::{anyhow, Result};
 use aws_sdk_ec2::client::Waiters;
 use aws_sdk_ec2::types::Filter;
+use aws_sdk_ec2::Client;
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::time::Duration;
@@ -15,8 +14,7 @@ pub struct Ec2Client {
 }
 
 impl Ec2Client {
-    pub async fn new(client: Option<Client>) -> Self {
-        let client = aws_client_or_default(client, Client::new).await;
+    pub async fn new(client: Client) -> Self {
         Self { client }
     }
 }
