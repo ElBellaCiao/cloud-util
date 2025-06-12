@@ -6,12 +6,11 @@ use serde::de::DeserializeOwned;
 #[derive(Debug, Clone)]
 pub struct RestApi {
     client: Client,
-    base_url: String,
 }
 
 impl RestApi {
-    pub fn new(client: Client, base_url: String) -> Self {
-        Self { client, base_url }
+    pub fn new(client: Client) -> Self {
+        Self { client }
     }
 }
 
@@ -20,16 +19,14 @@ impl crate::api::Api for RestApi {
     async fn send_request<T, B>(
         &self,
         method: reqwest::Method,
-        url_suffix: &str,
+        url: &str,
         body: Option<B>,
     ) -> Result<T>
     where
         T: DeserializeOwned + 'static,
         B: Serialize + Send + 'static,
     {
-        let url = format!("{}/{}", self.base_url, url_suffix);
-
-        let mut request_builder = self.client.request(method, &url);
+        let mut request_builder = self.client.request(method, url);
 
         if let Some(body_data) = body {
             request_builder = request_builder.json(&body_data);
