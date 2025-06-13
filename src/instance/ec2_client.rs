@@ -14,7 +14,7 @@ pub struct Ec2Client {
 }
 
 impl Ec2Client {
-    pub async fn new(client: Client) -> Self {
+    pub fn new(client: Client) -> Self {
         Self { client }
     }
 }
