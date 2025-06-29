@@ -34,3 +34,8 @@ pub use metadata::{Ec2Metadata, Metadata};
 mod api;
 #[cfg(feature = "api")]
 pub use api::{Api, RestApi};
+
+#[cfg(feature = "config-store")]
+mod config_store;
+#[cfg(feature = "config-store")]
+pub use config_store::{ConfigStore, SsmParameterClient};

@@ -8,7 +8,7 @@ edition = "2024"
 anyhow = "1"
 
 # AWS SDK
-aws-config = "1"
+aws-config = { version = "1", features = ["behavior-version-latest"] }
 aws-types = "1"
 thiserror = "2"
 tracing = { version = "0" }
@@ -34,3 +34,4 @@ secretsmanager = ["aws-sdk-secretsmanager"]
 table = ["aws-sdk-dynamodb", "serde", "serde_dynamo"]
 metadata = ["reqwest"]
 api = ["chrono", "reqwest", "serde"]
+config-store = ["aws-sdk-ssm"]
