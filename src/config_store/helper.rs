@@ -58,6 +58,10 @@ impl<'de> Deserializer<'de> for SsmParameterDeserializer {
     }
 }
 
+fn snake_case_to_kebab_case(s: &str) -> String {
+    s.replace('_', "-")
+}
+
 struct SsmParameterMapAccess {
     fields: &'static [&'static str],
     index: usize,
@@ -87,9 +91,11 @@ impl<'de> MapAccess<'de> for SsmParameterMapAccess {
         let field_name = self.fields[self.index];
         self.index += 1;
 
+        let kebab_case_key = snake_case_to_kebab_case(field_name);
+
         let key_str = self
             .client
-            .get_parameter(field_name)
+            .get_parameter(&kebab_case_key)
             .map_err(de::Error::custom)?;
 
         let key = seed.deserialize(StrDeserializer::new(&key_str))?;
