@@ -5,9 +5,7 @@ pub async fn aws_client_or_default<C>(
     match client {
         Some(c) => c,
         None => {
-            let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
-                .load()
-                .await;
+            let config = aws_config::load_from_env().await;
             make_client(&config)
         }
     }
