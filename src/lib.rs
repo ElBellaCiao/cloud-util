@@ -38,4 +38,4 @@ pub use api::{Api, RestApi};
 #[cfg(feature = "config-store")]
 mod config_store;
 #[cfg(feature = "config-store")]
-pub use config_store::{ConfigStore, SsmParameterClient};
+pub use config_store::{SyncSsmParameterClient, get_config};
