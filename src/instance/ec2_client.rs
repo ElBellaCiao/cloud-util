@@ -14,8 +14,8 @@ pub struct Ec2Client {
 }
 
 impl Ec2Client {
-    pub fn new(client: Client) -> Self {
-        Self { client }
+    pub fn builder() -> Ec2ClientBuilder {
+        Ec2ClientBuilder::default()
     }
 }
 
@@ -155,5 +155,29 @@ impl crate::instance::Instance for Ec2Client {
         };
 
         Ok(metadata)
+    }
+}
+
+#[derive(Default)]
+pub struct Ec2ClientBuilder {
+    client: Option<Client>,
+}
+
+impl Ec2ClientBuilder {
+    pub fn client(mut self, client: Client) -> Self {
+        self.client = Some(client);
+        self
+    }
+
+    pub async fn build(self) -> Ec2Client {
+        let client = match self.client {
+            Some(client) => client,
+            None => {
+                let config = aws_config::load_from_env().await;
+                Client::new(&config)
+            }
+        };
+
+        Ec2Client { client }
     }
 }
