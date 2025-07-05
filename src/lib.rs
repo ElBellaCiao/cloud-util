@@ -23,7 +23,7 @@ pub use secretsmanager::SecretsManager;
 #[cfg(feature = "table")]
 mod table;
 #[cfg(feature = "table")]
-pub use table::{DynamoDb, Keyed, Table};
+pub use table::{DynamoDbClient, Keyed, Table};
 
 #[cfg(feature = "metadata")]
 mod metadata;

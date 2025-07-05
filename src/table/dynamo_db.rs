@@ -1,5 +1,4 @@
 use crate::Table;
-use crate::helper::aws_client_or_default;
 use crate::table::Keyed;
 use anyhow::{Result, anyhow};
 use aws_sdk_dynamodb::Client;
@@ -7,19 +6,18 @@ use aws_sdk_dynamodb::types::AttributeValue;
 use serde::{Serialize, de::DeserializeOwned};
 use std::collections::HashMap;
 
-pub struct DynamoDb {
+pub struct DynamoDbClient {
     client: Client,
     table_name: String,
 }
-impl DynamoDb {
-    pub async fn new(client: Option<Client>, table_name: String) -> Self {
-        let client = aws_client_or_default(client, Client::new).await;
-        Self { client, table_name }
+impl DynamoDbClient {
+    pub fn builder() -> DynamoDbClientBuilder {
+        DynamoDbClientBuilder::default()
     }
 }
 
 #[async_trait::async_trait]
-impl<T> Table<T> for DynamoDb
+impl<T> Table<T> for DynamoDbClient
 where
     T: Serialize + DeserializeOwned + Keyed + Send + Sync + 'static,
 {
@@ -53,5 +51,37 @@ where
             .await?;
 
         Ok(())
+    }
+}
+
+#[derive(Default)]
+pub struct DynamoDbClientBuilder {
+    client: Option<Client>,
+    table_name: Option<String>,
+}
+
+impl DynamoDbClientBuilder {
+    pub fn client(mut self, client: Client) -> Self {
+        self.client = Some(client);
+        self
+    }
+
+    pub fn table_name(mut self, table_name: &str) -> Self {
+        self.table_name = Some(table_name.to_owned());
+        self
+    }
+
+    pub async fn build(self) -> Result<DynamoDbClient> {
+        let client = match self.client {
+            Some(client) => client,
+            None => {
+                let config = aws_config::load_from_env().await;
+                Client::new(&config)
+            }
+        };
+
+        let table_name = self.table_name.ok_or(anyhow!("Missing table name"))?;
+
+        Ok(DynamoDbClient { client, table_name })
     }
 }

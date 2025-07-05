@@ -1,5 +1,5 @@
 mod dynamo_db;
-pub use dynamo_db::DynamoDb;
+pub use dynamo_db::DynamoDbClient;
 
 use anyhow::Result;
 use serde::{Serialize, de::DeserializeOwned};
