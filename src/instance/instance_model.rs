@@ -1,5 +1,6 @@
 use crate::InstanceId;
 use aws_sdk_ec2::types::InstanceStateName;
+use std::collections::HashMap;
 use std::net::IpAddr;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -31,4 +32,5 @@ pub struct InstanceMetadata {
     pub instance_id: InstanceId,
     pub private_ip: IpAddr,
     pub status: InstanceState,
+    pub tags: HashMap<String, String>,
 }

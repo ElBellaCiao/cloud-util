@@ -148,10 +148,20 @@ impl crate::instance::Instance for Ec2Client {
             .and_then(|state| state.name())
             .ok_or_else(|| anyhow!("No status found for {}", instance_id))?;
 
+        let tags = instance
+            .tags()
+            .iter()
+            .filter_map(|tag| match (tag.key(), tag.value()) {
+                (Some(key), Some(value)) => Some((key.to_string(), value.to_string())),
+                _ => None,
+            })
+            .collect();
+
         let metadata = InstanceMetadata {
             private_ip,
             instance_id: instance_id.clone(),
             status: status.into(),
+            tags,
         };
 
         Ok(metadata)
