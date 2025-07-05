@@ -8,7 +8,7 @@ pub use instance::{Ec2Client, Instance, InstanceId, InstanceMetadata, InstanceSt
 #[cfg(feature = "manager")]
 mod manager;
 #[cfg(feature = "manager")]
-pub use manager::{Manager, Ssm};
+pub use manager::{Manager, SsmClient};
 
 #[cfg(feature = "code-pipeline")]
 mod code_pipeline;

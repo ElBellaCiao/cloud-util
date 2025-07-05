@@ -2,7 +2,7 @@ use crate::InstanceId;
 use anyhow::Result;
 
 mod ssm;
-pub use ssm::Ssm;
+pub use ssm::SsmClient;
 
 #[async_trait::async_trait]
 pub trait Manager: Send + Sync {

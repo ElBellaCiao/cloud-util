@@ -1,26 +1,24 @@
 use crate::InstanceId;
-use crate::helper::aws_client_or_default;
 use anyhow::{Result, anyhow, bail};
 use aws_sdk_ssm::Client;
 use aws_sdk_ssm::client::Waiters;
 use std::time::Duration;
 use tracing::{info, warn};
 
-pub struct Ssm {
+pub struct SsmClient {
     client: Client,
 }
 
-impl Ssm {
+impl SsmClient {
     const WORKING_DIR: &'static str = "/home/ec2-user";
 
-    pub async fn new(client: Option<Client>) -> Self {
-        let client = aws_client_or_default(client, Client::new).await;
-        Self { client }
+    pub fn builder() -> SsmClientBuilder {
+        SsmClientBuilder::default()
     }
 }
 
 #[async_trait::async_trait]
-impl crate::manager::Manager for Ssm {
+impl crate::manager::Manager for SsmClient {
     async fn send(&self, instance_ids: &[InstanceId], commands: Vec<String>) -> Result<()> {
         info!("Preparing commands: {commands:?}");
 
@@ -83,5 +81,29 @@ impl crate::manager::Manager for Ssm {
         }
 
         Ok(())
+    }
+}
+
+#[derive(Default)]
+pub struct SsmClientBuilder {
+    client: Option<Client>,
+}
+
+impl SsmClientBuilder {
+    pub fn client(mut self, client: Client) -> Self {
+        self.client = Some(client);
+        self
+    }
+
+    pub async fn build(self) -> SsmClient {
+        let client = match self.client {
+            Some(client) => client,
+            None => {
+                let config = aws_config::load_from_env().await;
+                Client::new(&config)
+            }
+        };
+
+        SsmClient { client }
     }
 }
