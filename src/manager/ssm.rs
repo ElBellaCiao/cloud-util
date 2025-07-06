@@ -2,6 +2,7 @@ use crate::InstanceId;
 use anyhow::{Result, anyhow, bail};
 use aws_sdk_ssm::Client;
 use aws_sdk_ssm::client::Waiters;
+use aws_sdk_ssm::operation::send_command::SendCommandOutput;
 use std::time::Duration;
 use tracing::{info, warn};
 
@@ -15,11 +16,12 @@ impl SsmClient {
     pub fn builder() -> SsmClientBuilder {
         SsmClientBuilder::default()
     }
-}
 
-#[async_trait::async_trait]
-impl crate::manager::Manager for SsmClient {
-    async fn send(&self, instance_ids: &[InstanceId], commands: Vec<String>) -> Result<()> {
+    async fn send_command_to_aws(
+        &self,
+        instance_ids: &[InstanceId],
+        commands: Vec<String>,
+    ) -> Result<SendCommandOutput> {
         info!("Preparing commands: {commands:?}");
 
         let instance_id_strings: Vec<String> = instance_ids
@@ -28,15 +30,30 @@ impl crate::manager::Manager for SsmClient {
             .map(str::to_string)
             .collect();
 
+        info!("Sending commands to instances: {instance_id_strings:?}");
+
         let response = self
             .client
             .send_command()
-            .set_instance_ids(Some(instance_id_strings.clone()))
+            .set_instance_ids(Some(instance_id_strings))
             .document_name("AWS-RunShellScript")
             .parameters("commands", commands)
             .parameters("workingDirectory", vec![Self::WORKING_DIR.to_string()])
             .send()
             .await?;
+
+        Ok(response)
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::manager::Manager for SsmClient {
+    async fn send_and_wait(
+        &self,
+        instance_ids: &[InstanceId],
+        commands: Vec<String>,
+    ) -> Result<()> {
+        let response = self.send_command_to_aws(instance_ids, commands).await?;
 
         let command = response
             .command()
@@ -45,13 +62,13 @@ impl crate::manager::Manager for SsmClient {
             .command_id()
             .ok_or_else(|| anyhow!("missing command id in response"))?;
 
-        for instance_id in &instance_id_strings {
+        for instance_id in instance_ids {
             info!("Sending commands to: {instance_id}");
 
             let waiting_result = self
                 .client
                 .wait_until_command_executed()
-                .instance_id(instance_id)
+                .instance_id(instance_id.to_string())
                 .command_id(command_id)
                 .wait(Duration::from_secs(60))
                 .await;
@@ -59,7 +76,7 @@ impl crate::manager::Manager for SsmClient {
             let output = self
                 .client
                 .get_command_invocation()
-                .instance_id(instance_id)
+                .instance_id(instance_id.to_string())
                 .command_id(command_id)
                 .send()
                 .await?;
@@ -80,6 +97,11 @@ impl crate::manager::Manager for SsmClient {
             }
         }
 
+        Ok(())
+    }
+
+    async fn send(&self, instance_ids: &[InstanceId], commands: Vec<String>) -> Result<()> {
+        let _ = self.send_command_to_aws(instance_ids, commands).await;
         Ok(())
     }
 }
