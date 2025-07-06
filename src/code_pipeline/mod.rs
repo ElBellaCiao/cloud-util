@@ -1,7 +1,7 @@
 use crate::helper::aws_client_or_default;
 use anyhow::Result;
 use aws_sdk_codepipeline::Client;
-use aws_sdk_codepipeline::types::FailureDetails;
+use aws_sdk_codepipeline::types::{FailureDetails, FailureType};
 use tracing::info;
 
 pub struct CodePipeline {
@@ -30,7 +30,10 @@ impl CodePipeline {
     pub async fn post_failure(&self, job_id: &str, msg: &str) -> Result<()> {
         info!("Job Failed: {msg}");
 
-        let failure_details = FailureDetails::builder().message(msg).build()?;
+        let failure_details = FailureDetails::builder()
+            .r#type(FailureType::JobFailed)
+            .message(msg)
+            .build()?;
 
         self.client
             .put_job_failure_result()
