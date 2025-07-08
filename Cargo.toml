@@ -29,7 +29,7 @@ tokio = { version = "1.0", features = ["rt-multi-thread"], optional = true }
 [features]
 instance = ["aws-sdk-ec2", "derive_more", "regex", "serde"]
 manager = ["aws-sdk-ssm", "instance"]
-code-pipeline = ["aws-sdk-codepipeline"]
+pipeline = ["aws-sdk-codepipeline"]
 secretsmanager = ["aws-sdk-secretsmanager"]
 table = ["aws-sdk-dynamodb", "serde", "serde_dynamo"]
 metadata = ["reqwest"]

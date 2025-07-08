@@ -10,10 +10,10 @@ mod manager;
 #[cfg(feature = "manager")]
 pub use manager::{Manager, SsmClient};
 
-#[cfg(feature = "code-pipeline")]
-mod code_pipeline;
-#[cfg(feature = "code-pipeline")]
-pub use code_pipeline::CodePipeline;
+#[cfg(feature = "pipeline")]
+mod pipeline;
+#[cfg(feature = "pipeline")]
+pub use pipeline::{CodePipelineClient, Pipeline};
 
 #[cfg(feature = "secretsmanager")]
 mod secretsmanager;
