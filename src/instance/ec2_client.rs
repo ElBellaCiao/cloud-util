@@ -17,6 +17,30 @@ impl Ec2Client {
     pub fn builder() -> Ec2ClientBuilder {
         Ec2ClientBuilder::default()
     }
+
+    async fn find_instances_by_filter(&self, filters: Vec<Filter>) -> Result<Vec<InstanceId>> {
+        let response = self
+            .client
+            .describe_instances()
+            .set_filters(Some(filters.clone()))
+            .send()
+            .await?;
+
+        let instance_ids: Vec<InstanceId> = response
+            .reservations()
+            .iter()
+            .flat_map(|reservation| reservation.instances())
+            .filter_map(|instance| instance.instance_id())
+            .map(InstanceId::new)
+            .collect::<Result<Vec<InstanceId>>>()?;
+
+        info!(
+            "Found {} instance(s) with filters \"{:?}\"",
+            instance_ids.len(),
+            filters
+        );
+        Ok(instance_ids)
+    }
 }
 
 #[async_trait::async_trait]
@@ -54,27 +78,13 @@ impl crate::instance::Instance for Ec2Client {
             })
             .collect();
 
-        let response = self
-            .client
-            .describe_instances()
-            .set_filters(Some(filters))
-            .send()
-            .await?;
+        self.find_instances_by_filter(filters).await
+    }
 
-        let instance_ids: Vec<InstanceId> = response
-            .reservations()
-            .iter()
-            .flat_map(|reservation| reservation.instances())
-            .filter_map(|instance| instance.instance_id())
-            .map(InstanceId::new)
-            .collect::<Result<Vec<InstanceId>>>()?;
+    async fn get_instances_by_tag_key(&self, tag_key: &str) -> Result<Vec<InstanceId>> {
+        let filter = Filter::builder().name("tag-key").values(tag_key).build();
 
-        info!(
-            "Found {} instance(s) with tags \"{:?}\"",
-            instance_ids.len(),
-            tags
-        );
-        Ok(instance_ids)
+        self.find_instances_by_filter(vec![filter]).await
     }
 
     async fn start_instances(&self, instance_ids: &[InstanceId]) -> Result<()> {
