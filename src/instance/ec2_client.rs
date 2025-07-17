@@ -81,12 +81,6 @@ impl crate::instance::Instance for Ec2Client {
         self.find_instances_by_filter(filters).await
     }
 
-    async fn get_instances_by_tag_key(&self, tag_key: &str) -> Result<Vec<InstanceId>> {
-        let filter = Filter::builder().name("tag-key").values(tag_key).build();
-
-        self.find_instances_by_filter(vec![filter]).await
-    }
-
     async fn start_instances(&self, instance_ids: &[InstanceId]) -> Result<()> {
         let instance_id_strings: Vec<String> = instance_ids
             .iter()
