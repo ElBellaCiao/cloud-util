@@ -28,6 +28,7 @@ impl From<&InstanceStateName> for InstanceState {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct InstanceMetadata {
     pub instance_id: InstanceId,
     pub private_ip: IpAddr,

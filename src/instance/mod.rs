@@ -18,8 +18,7 @@ pub trait Instance: Send + Sync {
     async fn get_instances_by_tags(
         &self,
         tags: &HashMap<String, String>,
-    ) -> Result<Vec<InstanceId>>;
+    ) -> Result<Vec<InstanceMetadata>>;
     async fn start_instances(&self, instance_ids: &[InstanceId]) -> Result<()>;
     async fn stop_instances(&self, instance_ids: &[InstanceId]) -> Result<()>;
-    async fn get_instance_metadata(&self, instance_id: &InstanceId) -> Result<InstanceMetadata>;
 }

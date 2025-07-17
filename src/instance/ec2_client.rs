@@ -3,7 +3,7 @@ use crate::instance::InstanceMetadata;
 use anyhow::{Result, anyhow};
 use aws_sdk_ec2::Client;
 use aws_sdk_ec2::client::Waiters;
-use aws_sdk_ec2::types::Filter;
+use aws_sdk_ec2::types::{Filter, Instance};
 use std::collections::HashMap;
 use std::net::IpAddr;
 use std::time::Duration;
@@ -18,7 +18,10 @@ impl Ec2Client {
         Ec2ClientBuilder::default()
     }
 
-    async fn find_instances_by_filter(&self, filters: Vec<Filter>) -> Result<Vec<InstanceId>> {
+    async fn find_instances_by_filter(
+        &self,
+        filters: Vec<Filter>,
+    ) -> Result<Vec<InstanceMetadata>> {
         let response = self
             .client
             .describe_instances()
@@ -26,19 +29,19 @@ impl Ec2Client {
             .send()
             .await?;
 
-        let instance_ids: Vec<InstanceId> = response
+        let instance_ids = response
             .reservations()
             .iter()
             .flat_map(|reservation| reservation.instances())
-            .filter_map(|instance| instance.instance_id())
-            .map(InstanceId::new)
-            .collect::<Result<Vec<InstanceId>>>()?;
+            .map(|instance| instance.try_into())
+            .collect::<Result<Vec<InstanceMetadata>, _>>()?;
 
         info!(
-            "Found {} instance(s) with filters \"{:?}\"",
-            instance_ids.len(),
+            "Found \"{:?}\" with filters \"{:?}\"",
+            instance_ids.clone(),
             filters
         );
+
         Ok(instance_ids)
     }
 }
@@ -67,7 +70,7 @@ impl crate::instance::Instance for Ec2Client {
     async fn get_instances_by_tags(
         &self,
         tags: &HashMap<String, String>,
-    ) -> Result<Vec<InstanceId>> {
+    ) -> Result<Vec<InstanceMetadata>> {
         let filters = tags
             .iter()
             .map(|(key, value)| {
@@ -126,33 +129,28 @@ impl crate::instance::Instance for Ec2Client {
         info!("Stopped {} instance(s)", instance_ids.len());
         Ok(())
     }
+}
 
-    async fn get_instance_metadata(&self, instance_id: &InstanceId) -> Result<InstanceMetadata> {
-        let response = self
-            .client
-            .describe_instances()
-            .instance_ids(instance_id.to_string())
-            .send()
-            .await?;
+impl TryFrom<&Instance> for InstanceMetadata {
+    type Error = anyhow::Error;
 
-        let instance = response
-            .reservations()
-            .iter()
-            .flat_map(|r| r.instances())
-            .find(|inst| inst.instance_id() == Some(instance_id.as_ref()))
-            .ok_or_else(|| anyhow!("Instance {} not found", instance_id))?;
+    fn try_from(value: &Instance) -> std::result::Result<Self, Self::Error> {
+        let instance_id = value
+            .instance_id
+            .clone()
+            .ok_or(anyhow!("No instance id Found"))?;
 
-        let private_ip = instance
+        let private_ip = value
             .private_ip_address()
-            .ok_or_else(|| anyhow!("No private IP found for {}", instance_id))?
+            .ok_or(anyhow!("No private IP found for {}", instance_id))?
             .parse::<IpAddr>()?;
 
-        let status = instance
+        let status = value
             .state()
             .and_then(|state| state.name())
-            .ok_or_else(|| anyhow!("No status found for {}", instance_id))?;
+            .ok_or(anyhow!("No status found for {}", instance_id))?;
 
-        let tags = instance
+        let tags = value
             .tags()
             .iter()
             .filter_map(|tag| match (tag.key(), tag.value()) {
@@ -161,14 +159,12 @@ impl crate::instance::Instance for Ec2Client {
             })
             .collect();
 
-        let metadata = InstanceMetadata {
+        Ok(InstanceMetadata {
             private_ip,
-            instance_id: instance_id.clone(),
+            instance_id: InstanceId::new(instance_id)?,
             status: status.into(),
             tags,
-        };
-
-        Ok(metadata)
+        })
     }
 }
 
