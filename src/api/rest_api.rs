@@ -9,8 +9,8 @@ pub struct RestApi {
 }
 
 impl RestApi {
-    pub fn new(client: Client) -> Self {
-        Self { client }
+    pub fn builder() -> RestApiBuilder {
+        RestApiBuilder::default()
     }
 }
 
@@ -46,5 +46,23 @@ impl crate::api::Api for RestApi {
         let data = response.json::<T>().await?;
 
         Ok(data)
+    }
+}
+
+#[derive(Default)]
+pub struct RestApiBuilder {
+    client: Option<Client>,
+}
+
+impl RestApiBuilder {
+    pub fn client(mut self, client: Client) -> Self {
+        self.client = Some(client);
+        self
+    }
+
+    pub async fn build(self) -> RestApi {
+        RestApi {
+            client: self.client.unwrap_or_default(),
+        }
     }
 }
