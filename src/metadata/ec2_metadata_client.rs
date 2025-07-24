@@ -34,7 +34,7 @@ impl crate::metadata::Metadata for Ec2MetadataClient {
         self.request("instance-id").await
     }
 
-    async fn get_tag_value(&self, tag_key: impl Display + Send) -> Result<String> {
+    async fn get_tag_value(&self, tag_key: &str) -> Result<String> {
         self.request(format!("tags/instance/{}", tag_key)).await
     }
 
