@@ -23,7 +23,7 @@ pub use secretsmanager::SecretsManager;
 #[cfg(feature = "table")]
 mod table;
 #[cfg(feature = "table")]
-pub use table::{DynamoDbClient, Keyed, Table};
+pub use table::{DynamoDbClient, Table};
 
 #[cfg(feature = "metadata")]
 mod metadata;
@@ -39,3 +39,8 @@ pub use api::{Api, RestApi};
 mod config_store;
 #[cfg(feature = "config-store")]
 pub use config_store::{SyncSsmParameterClient, get_config};
+
+#[cfg(feature = "model")]
+mod model;
+#[cfg(feature = "model")]
+pub use model::Keyed;

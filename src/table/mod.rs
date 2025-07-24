@@ -1,13 +1,10 @@
 mod dynamo_db;
 pub use dynamo_db::DynamoDbClient;
 
+use crate::model::Keyed;
 use anyhow::Result;
 use serde::{Serialize, de::DeserializeOwned};
 
-pub trait Keyed {
-    fn pk(&self) -> String;
-    fn sk(&self) -> String;
-}
 #[async_trait::async_trait]
 pub trait Table<T>: Send + Sync
 where
