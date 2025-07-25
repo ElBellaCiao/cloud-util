@@ -52,6 +52,27 @@ where
 
         Ok(())
     }
+
+    async fn get_entries_by_pk(&self, pk: &str) -> Result<Vec<T>> {
+        let resp = self
+            .client
+            .query()
+            .table_name(&self.table_name)
+            .key_condition_expression("PK = :pk")
+            .expression_attribute_values(":pk", AttributeValue::S(pk.to_string()))
+            .send()
+            .await?;
+
+        let items = resp.items.unwrap_or_default();
+        let mut results = Vec::new();
+
+        for item in items {
+            let result: T = serde_dynamo::from_item(item)?;
+            results.push(result);
+        }
+
+        Ok(results)
+    }
 }
 
 #[derive(Default)]

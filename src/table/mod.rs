@@ -12,4 +12,5 @@ where
 {
     async fn get_entry(&self, pk: &str, sk: &str) -> Result<T>;
     async fn put_entry(&self, item: T) -> Result<()>;
+    async fn get_entries_by_pk(&self, pk: &str) -> Result<Vec<T>>;
 }
